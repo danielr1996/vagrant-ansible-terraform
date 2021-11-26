@@ -11,11 +11,10 @@ Vagrant.configure("2") do |config|
   config.vm.box = "danielr1996/ansible-terraform"
   config.vm.synced_folder "./", "/home/vagrant/project", :mount_options => ["fmode=700"]
   config.ssh.extra_args = ["-t", "cd /home/vagrant/project; bash --login"]
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo apt -y update
-    sudo apt -y install python3-pip
-    sudo python3 -m pip install ansible
-  SHELL
+  config.vm.provision "shell", run: "always", inline: <<SHELL
+  # !IMPORTANT! specify the location to your terraform folder that includes terraform.tfstate
+  echo "export ANSIBLE_TF_DIR=/home/vagrant/project/terraform" > /etc/profile.d/env.sh
+SHELL
 end
 ```
 
@@ -23,7 +22,7 @@ Start the box with `vagrant up` and login with `vagrant ssh`.
 
 `terraform` and `ansible` are on the path, so you can use them right ahead.
 
-To populate your terraform state refer to [terraform-provider-ansible](https://github.com/nbering/terraform-provider-ansible/).
+This box comes with [terraform-inventory](https://github.com/nbering/terraform-inventory) preconfigured, to populate your terraform state refer to [terraform-provider-ansible](https://github.com/nbering/terraform-provider-ansible/).
 
 To quickly verify that all your hosts are reachable run `ansible all -m ping`
 
